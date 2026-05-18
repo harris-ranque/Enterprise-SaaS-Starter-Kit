@@ -4,6 +4,7 @@ import { AppModule } from './app.module';
 
 import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const logger = WinstonModule.createLogger({
@@ -22,6 +23,8 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule, { logger });
 
+  app.use(cookieParser());
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -29,6 +32,11 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
+
+  app.enableCors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+  });
 
   app.setGlobalPrefix('api');
   await app.listen(process.env.PORT ?? 3001, '0.0.0.0');
