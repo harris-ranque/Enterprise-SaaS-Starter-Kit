@@ -7,6 +7,8 @@ import { PrismaModule } from './database/prisma.module';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { OrganizationsModule } from './modules/organizations/organizations.module';
+import { HealthModule } from './modules/health/health.module';
+import { StripeModule } from './modules/stripe/stripe.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { OrganizationsModule } from './modules/organizations/organizations.modul
     UsersModule,
     AuthModule,
     OrganizationsModule,
+    HealthModule,
+    StripeModule,
   ],
   // controllers: [AppController],
   // providers: [AppService],

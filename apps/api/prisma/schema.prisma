@@ -18,23 +18,48 @@ model User {
   hashedRefreshToken String?
   tokenVersion       Int      @default(0)
 
-  organizationId     String?
-  organization       Organization? @relation("OrganizationMembers", fields: [organizationId], references: [id])
+  organizationId String?
+  organization   Organization? @relation("OrganizationMembers", fields: [organizationId], references: [id])
 
   ownedOrganization Organization? @relation("OrganizationOwner")
 }
 
 model Organization {
-  id          String   @id @default(uuid())
+  id          String  @id @default(uuid())
   name        String
-  slug        String   @unique
+  slug        String  @unique
   description String?
   logoUrl     String?
-  ownerId     String   @unique
-  owner       User     @relation("OrganizationOwner", fields: [ownerId], references: [id])
-  members     User[]   @relation("OrganizationMembers")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  ownerId     String  @unique
+  owner       User    @relation("OrganizationOwner", fields: [ownerId], references: [id])
+  members     User[]  @relation("OrganizationMembers")
+
+  // ===============================
+  // Stripe connect
+  // ===============================
+
+  stripeAccountId          String?
+  stripeOnboardingComplete Boolean @default(false)
+
+  payments Payment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Payment {
+  id                    String       @id @default(cuid())
+  organizationId        String
+  organization          Organization @relation(fields: [organizationId], references: [id])
+  stripePaymentIntentId String       @unique
+  amount                Int
+  currency              String
+  status                String
+  platformFee           Int
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+
+  @@index([organizationId])
 }
 
 enum Role {
