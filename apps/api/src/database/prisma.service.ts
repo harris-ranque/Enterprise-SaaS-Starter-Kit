@@ -23,4 +23,21 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
   async onModuleDestroy(): Promise<void> {
     await this.client.$disconnect();
   }
+
+  findPaymentByStripePaymentIntentId(
+    stripePaymentIntentId: string,
+  ): Promise<{ id: string } | null> {
+    return this.client.payment.findUnique({
+      where: { stripePaymentIntentId },
+      select: { id: true },
+    });
+  }
+
+  updatePaymentStatus(id: string, status: string): Promise<{ id: string }> {
+    return this.client.payment.update({
+      where: { id },
+      data: { status },
+      select: { id: true },
+    });
+  }
 }
