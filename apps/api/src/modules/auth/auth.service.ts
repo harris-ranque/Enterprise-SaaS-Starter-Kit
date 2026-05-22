@@ -15,6 +15,7 @@ import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { JwtPayload } from './types/jwt-payload.type';
 import { getLoginRateLimiter } from '../../common/security/login-rate-limit';
+import { EmailService } from '../queues/email/email.service';
 
 export type AuthTokenResponse = {
   access_token: string;
@@ -43,6 +44,7 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private emailService: EmailService,
   ) {}
 
   // ================================
@@ -65,7 +67,7 @@ export class AuthService {
         name: registerDto.name,
       },
     });
-
+    await this.emailService.sendWelcomeEmail(user.email, user.name ?? '');
     const tokens = await this.generateToken(user.id, user.email, user.role);
 
     await this.updateRefreshToken(user.id, tokens.refresh_token);

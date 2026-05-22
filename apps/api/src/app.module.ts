@@ -12,6 +12,9 @@ import { StripeModule } from './modules/stripe/stripe.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard } from '@nestjs/throttler';
+import { BullModule } from '@nestjs/bullmq';
+import { EmailModule } from './modules/queues/email/email.module';
+import { PaymentModule } from './modules/queues/payment/payment.module';
 
 @Module({
   imports: [
@@ -31,6 +34,14 @@ import { ThrottlerGuard } from '@nestjs/throttler';
         limit: 5,
       },
     ]),
+    BullModule.forRoot({
+      connection: {
+        host: process.env.REDIS_HOST,
+        port: Number(process.env.REDIS_PORT),
+      },
+    }),
+    EmailModule,
+    PaymentModule,
   ],
   // controllers: [AppController],
   providers: [

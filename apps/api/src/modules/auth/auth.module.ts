@@ -4,6 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 import type { AppConfig } from '../../config/configuration';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { EmailModule } from '../queues/email/email.module';
 import { PrismaModule } from '../../database/prisma.module';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { envValidationSchema } from '../../config/env.validation';
@@ -11,6 +12,7 @@ import { envValidationSchema } from '../../config/env.validation';
 @Module({
   imports: [
     PrismaModule,
+    EmailModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
