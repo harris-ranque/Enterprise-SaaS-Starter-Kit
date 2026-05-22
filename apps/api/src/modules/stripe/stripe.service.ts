@@ -10,6 +10,7 @@ import Stripe from 'stripe';
 import { PrismaService } from '../../database/prisma.service';
 import { SubscriptionPlan } from './dto/create-subscription.dto';
 import { STRIPE_CLIENT } from './stripe.client';
+import { RealtimeService } from '../realtime/realtime.service';
 
 export type StripeConnectAccountResult =
   | { url: string }
@@ -41,6 +42,7 @@ export class StripeService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly config: ConfigService,
+    private readonly realtime: RealtimeService,
     @Inject(STRIPE_CLIENT) private readonly stripe: Stripe.Stripe,
   ) {}
 
@@ -169,6 +171,7 @@ export class StripeService {
     }
 
     await this.prisma.updatePaymentStatus(payment.id, 'SUCCEEDED');
+    this.realtime.paymentSuccess(payment.organizationId, payment);
 
     console.log(`Payment ${payment.id} succeeded`);
   }
@@ -352,7 +355,7 @@ export class StripeService {
     // Existing Customer
     // ================================
     if (organization.stripeCustomerId) {
-      return organization.stripeCustomerId as string;
+      return organization.stripeCustomerId;
     }
 
     // ================================

@@ -16,6 +16,7 @@ import { BullModule } from '@nestjs/bullmq';
 import { EmailModule } from './modules/queues/email/email.module';
 import { PaymentModule } from './modules/queues/payment/payment.module';
 import { StorageModule } from './modules/storage/storage.module';
+import { RealtimeModule } from './modules/realtime/realtime.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { StorageModule } from './modules/storage/storage.module';
     EmailModule,
     PaymentModule,
     StorageModule,
+    RealtimeModule,
   ],
   // controllers: [AppController],
   providers: [

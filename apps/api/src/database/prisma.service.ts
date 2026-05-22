@@ -27,10 +27,10 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
 
   findPaymentByStripePaymentIntentId(
     stripePaymentIntentId: string,
-  ): Promise<{ id: string } | null> {
+  ): Promise<{ id: string; organizationId: string } | null> {
     return this.client.payment.findUnique({
       where: { stripePaymentIntentId },
-      select: { id: true },
+      select: { id: true, organizationId: true },
     });
   }
 
