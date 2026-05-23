@@ -24,6 +24,8 @@ model User {
   ownedOrganization Organization? @relation("OrganizationOwner")
 
   uploadedFiles File[]
+
+  notifications Notification[]
 }
 
 model Organization {
@@ -89,6 +91,21 @@ model File {
 
   @@index([organizationId])
   @@index([uploadedById])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  type      String
+  title     String
+  message   String
+  metadata  Json?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([userId, read])
 }
 
 enum Role {

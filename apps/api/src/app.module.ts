@@ -17,6 +17,7 @@ import { EmailModule } from './modules/queues/email/email.module';
 import { PaymentModule } from './modules/queues/payment/payment.module';
 import { StorageModule } from './modules/storage/storage.module';
 import { RealtimeModule } from './modules/realtime/realtime.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { RealtimeModule } from './modules/realtime/realtime.module';
     PaymentModule,
     StorageModule,
     RealtimeModule,
+    NotificationsModule,
   ],
   // controllers: [AppController],
   providers: [

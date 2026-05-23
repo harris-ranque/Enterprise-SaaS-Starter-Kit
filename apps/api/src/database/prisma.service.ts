@@ -1,7 +1,7 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Prisma, PrismaClient } from '@prisma/client';
-import type { File as StoredFile } from '@prisma/client';
+import type { File as StoredFile, Payment } from '@prisma/client';
 import type { AppConfig } from '../config/configuration';
 import { createPrismaPgAdapter } from './create-prisma-adapter';
 
@@ -27,10 +27,9 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
 
   findPaymentByStripePaymentIntentId(
     stripePaymentIntentId: string,
-  ): Promise<{ id: string; organizationId: string } | null> {
+  ): Promise<Payment | null> {
     return this.client.payment.findUnique({
       where: { stripePaymentIntentId },
-      select: { id: true, organizationId: true },
     });
   }
 

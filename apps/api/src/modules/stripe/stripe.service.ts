@@ -11,6 +11,7 @@ import { PrismaService } from '../../database/prisma.service';
 import { SubscriptionPlan } from './dto/create-subscription.dto';
 import { STRIPE_CLIENT } from './stripe.client';
 import { RealtimeService } from '../realtime/realtime.service';
+import { NotificationsService } from '../notifications/notifications.service';
 
 export type StripeConnectAccountResult =
   | { url: string }
@@ -43,6 +44,7 @@ export class StripeService {
     private readonly prisma: PrismaService,
     private readonly config: ConfigService,
     private readonly realtime: RealtimeService,
+    private readonly notifications: NotificationsService,
     @Inject(STRIPE_CLIENT) private readonly stripe: Stripe.Stripe,
   ) {}
 
@@ -172,6 +174,28 @@ export class StripeService {
 
     await this.prisma.updatePaymentStatus(payment.id, 'SUCCEEDED');
     this.realtime.paymentSuccess(payment.organizationId, payment);
+
+    const organization = await this.prisma.client.organization.findUnique({
+      where: {
+        id: payment.organizationId,
+      },
+    });
+
+    if (organization) {
+      await this.notifications.createNotification({
+        userId: organization.ownerId,
+
+        type: 'PAYMENT_SUCCESS',
+
+        title: 'Payment Received',
+
+        message: `Payment of $${payment.amount / 100} succeeded`,
+
+        metadata: {
+          paymentId: payment.id,
+        },
+      });
+    }
 
     console.log(`Payment ${payment.id} succeeded`);
   }
