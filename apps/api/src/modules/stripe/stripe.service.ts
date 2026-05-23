@@ -12,6 +12,7 @@ import { SubscriptionPlan } from './dto/create-subscription.dto';
 import { STRIPE_CLIENT } from './stripe.client';
 import { RealtimeService } from '../realtime/realtime.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { AuditService } from '../audit/audit.service';
 
 export type StripeConnectAccountResult =
   | { url: string }
@@ -45,6 +46,7 @@ export class StripeService {
     private readonly config: ConfigService,
     private readonly realtime: RealtimeService,
     private readonly notifications: NotificationsService,
+    private readonly auditService: AuditService,
     @Inject(STRIPE_CLIENT) private readonly stripe: Stripe.Stripe,
   ) {}
 
@@ -182,6 +184,19 @@ export class StripeService {
     });
 
     if (organization) {
+      await this.auditService.log({
+        action: 'PAYMENT_SUCCEEDED',
+
+        resource: 'PAYMENT',
+
+        resourceId: payment.id,
+
+        metadata: {
+          amount: payment.amount,
+
+          organizationId: payment.organizationId,
+        },
+      });
       await this.notifications.createNotification({
         userId: organization.ownerId,
 

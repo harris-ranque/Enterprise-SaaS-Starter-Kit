@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import type { AppConfig } from '../../config/configuration';
@@ -8,6 +8,7 @@ import { EmailModule } from '../queues/email/email.module';
 import { PrismaModule } from '../../database/prisma.module';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { envValidationSchema } from '../../config/env.validation';
+import { AuditModule } from '../audit/audit.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { envValidationSchema } from '../../config/env.validation';
       isGlobal: true,
       validationSchema: envValidationSchema,
     }),
+    forwardRef(() => AuditModule),
   ],
   providers: [AuthService, GoogleStrategy],
   controllers: [AuthController],

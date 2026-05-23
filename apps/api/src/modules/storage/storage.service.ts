@@ -5,6 +5,7 @@ import type { File as StoredFile } from '@prisma/client';
 import { randomUUID } from 'crypto';
 
 import { PrismaService } from '../../database/prisma.service';
+import { AuditService } from '../audit/audit.service';
 import { r2Client } from './r2.client';
 import { CreateUploadUrlDto } from './dto/create-upload-url.dto';
 
@@ -14,7 +15,10 @@ const UPLOAD_URL_TTL_SECONDS = 60 * 5;
 
 @Injectable()
 export class StorageService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly auditService: AuditService,
+  ) {}
 
   async createUploadUrl(
     dto: CreateUploadUrlDto,
@@ -64,6 +68,22 @@ export class StorageService {
       size: dto.size,
       storageKey,
       publicUrl,
+    });
+
+    await this.auditService.log({
+      userId: user.id,
+
+      action: 'FILE_UPLOADED',
+
+      resource: 'FILE',
+
+      resourceId: file.id,
+
+      metadata: {
+        fileName: file.originalName,
+
+        mimeType: file.mimeType,
+      },
     });
 
     return { uploadUrl, file };

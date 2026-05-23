@@ -16,6 +16,7 @@ import { RegisterDto } from './dto/register.dto';
 import { JwtPayload } from './types/jwt-payload.type';
 import { getLoginRateLimiter } from '../../common/security/login-rate-limit';
 import { EmailService } from '../queues/email/email.service';
+import { AuditService } from '../audit/audit.service';
 
 export type AuthTokenResponse = {
   access_token: string;
@@ -45,6 +46,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private emailService: EmailService,
+    private auditService: AuditService,
   ) {}
 
   // ================================
@@ -89,6 +91,11 @@ export class AuthService {
     });
 
     if (!user || !user.password) {
+      await this.auditService.log({
+        action: 'LOGIN_FAILED',
+        resource: 'AUTH',
+        metadata: { email: loginDto.email },
+      });
       throw new UnauthorizedException('Invalid credentials');
     }
 
@@ -104,6 +111,17 @@ export class AuthService {
     const tokens = await this.generateToken(user.id, user.email, user.role);
 
     await this.updateRefreshToken(user.id, tokens.refresh_token);
+    await this.auditService.log({
+      userId: user.id,
+
+      action: 'LOGIN_SUCCESS',
+
+      resource: 'AUTH',
+
+      metadata: {
+        email: user.email,
+      },
+    });
 
     return tokens;
   }

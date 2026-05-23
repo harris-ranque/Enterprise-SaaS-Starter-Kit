@@ -18,6 +18,7 @@ import { PaymentModule } from './modules/queues/payment/payment.module';
 import { StorageModule } from './modules/storage/storage.module';
 import { RealtimeModule } from './modules/realtime/realtime.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { AuditModule } from './modules/audit/audit.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     StorageModule,
     RealtimeModule,
     NotificationsModule,
+    AuditModule,
   ],
   // controllers: [AppController],
   providers: [

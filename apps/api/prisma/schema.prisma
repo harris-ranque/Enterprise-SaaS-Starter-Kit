@@ -26,6 +26,8 @@ model User {
   uploadedFiles File[]
 
   notifications Notification[]
+
+  auditLogs AuditLog[]
 }
 
 model Organization {
@@ -106,6 +108,23 @@ model Notification {
 
   @@index([userId])
   @@index([userId, read])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  action     String
+  resource   String
+  resourceId String?
+  ipAddress  String?
+  userAgent  String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([resource, resourceId])
+  @@index([createdAt])
 }
 
 enum Role {
