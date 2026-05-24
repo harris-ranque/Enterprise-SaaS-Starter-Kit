@@ -24,6 +24,7 @@ import { LoggerModule } from './common/logger/logger.module';
 import { MetricsModule } from './modules/metrics/metrics.module';
 import { TenantMiddleware } from './common/middleware/tenant/tenant.middleware';
 import { BillingModule } from './modules/billing/billing.module';
+import { QueuesModule } from './modules/queues/queues.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { BillingModule } from './modules/billing/billing.module';
     LoggerModule,
     MetricsModule,
     BillingModule,
+    QueuesModule,
   ],
   // controllers: [AppController],
   providers: [
