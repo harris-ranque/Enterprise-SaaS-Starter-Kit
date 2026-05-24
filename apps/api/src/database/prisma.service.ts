@@ -1,9 +1,19 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Prisma, PrismaClient } from '@prisma/client';
-import type { File as StoredFile, Payment } from '@prisma/client';
+import type { File as StoredFile, Payment, Role } from '@prisma/client';
 import type { AppConfig } from '../config/configuration';
+import type { SubscriptionPlan } from '../common/enums/subscriptionplan.enum';
 import { createPrismaPgAdapter } from './create-prisma-adapter';
+
+export type OrganizationPlanRow = {
+  subscriptionPlan: SubscriptionPlan;
+  memberLimit: number;
+};
+
+export type OrganizationWithMemberCount = OrganizationPlanRow & {
+  _count: { members: number };
+};
 
 @Injectable()
 export class PrismaService implements OnModuleInit, OnModuleDestroy {
@@ -43,5 +53,37 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
 
   createFile(data: Prisma.FileUncheckedCreateInput): Promise<StoredFile> {
     return this.client.file.create({ data });
+  }
+
+  findOrganizationMembership(
+    organizationId: string,
+    userId: string,
+  ): Promise<{ role: Role } | null> {
+    return this.client.organizationMember.findFirst({
+      where: { organizationId, userId },
+      select: { role: true },
+    });
+  }
+
+  findOrganizationPlan(
+    organizationId: string,
+  ): Promise<OrganizationPlanRow | null> {
+    return this.client.organization.findUnique({
+      where: { id: organizationId },
+      select: { subscriptionPlan: true, memberLimit: true },
+    });
+  }
+
+  findOrganizationWithMemberCount(
+    organizationId: string,
+  ): Promise<OrganizationWithMemberCount | null> {
+    return this.client.organization.findUnique({
+      where: { id: organizationId },
+      select: {
+        subscriptionPlan: true,
+        memberLimit: true,
+        _count: { select: { members: true } },
+      },
+    });
   }
 }

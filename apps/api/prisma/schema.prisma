@@ -64,6 +64,15 @@ model Organization {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+
+  subscriptionPlan SubscriptionPlan     @default(FREE)
+
+  memberLimit Int  @default(5)
+
+  storageLimitMb Int   @default(1024)
+
+  apiLimitPerMonth Int   @default(10000)
 }
 
 model Payment {
@@ -147,4 +156,12 @@ enum Role {
   VENDOR
   ADMIN
   STAFF
+}
+
+
+enum SubscriptionPlan {
+  FREE
+  STARTER
+  PROFESSIONAL
+  ENTERPRISE
 }
