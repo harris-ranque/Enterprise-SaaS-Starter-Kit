@@ -1,13 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotificationsController } from './notifications.controller';
+import { NotificationsService } from './notifications.service';
+import { applyGuardOverrides } from '../../test/testing-utils';
 
 describe('NotificationsController', () => {
   let controller: NotificationsController;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [NotificationsController],
-    }).compile();
+    const module: TestingModule = await applyGuardOverrides(
+      Test.createTestingModule({
+        controllers: [NotificationsController],
+        providers: [{ provide: NotificationsService, useValue: {} }],
+      }),
+    ).compile();
 
     controller = module.get<NotificationsController>(NotificationsController);
   });
