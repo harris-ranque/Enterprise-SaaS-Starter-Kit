@@ -20,19 +20,13 @@ function OauthSuccessContent() {
     router.push('/dashboard');
   }, [params, router, setAccessToken]);
 
-  return (
-    <div className="flex min-h-screen items-center justify-center">Loading...</div>
-  );
+  return <div className="flex min-h-screen items-center justify-center">Loading...</div>;
 }
 
 export default function OauthSuccessPage() {
   return (
     <Suspense
-      fallback={
-        <div className="flex min-h-screen items-center justify-center">
-          Loading...
-        </div>
-      }
+      fallback={<div className="flex min-h-screen items-center justify-center">Loading...</div>}
     >
       <OauthSuccessContent />
     </Suspense>

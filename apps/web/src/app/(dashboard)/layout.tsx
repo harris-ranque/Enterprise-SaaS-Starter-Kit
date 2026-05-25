@@ -20,9 +20,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   if (!isInitialized) {
     return (
-      <div className="flex min-h-screen items-center justify-center text-zinc-500">
-        Loading...
-      </div>
+      <div className="flex min-h-screen items-center justify-center text-zinc-500">Loading...</div>
     );
   }
 

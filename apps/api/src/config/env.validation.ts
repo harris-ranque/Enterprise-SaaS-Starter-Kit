@@ -14,4 +14,16 @@ export const envValidationSchema = Joi.object({
   REDIS_PORT: Joi.number().required(),
 
   SENTRY_DSN: Joi.string().uri().allow('').optional(),
+
+  API_VERSION: Joi.string().pattern(/^\d+$/).default('1'),
+
+  LOG_LEVEL: Joi.string()
+    .valid('fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent')
+    .optional(),
+
+  LOG_HTTP: Joi.boolean().optional(),
+
+  LOG_HTTP_VERBOSE: Joi.boolean().optional(),
+
+  LOG_PRETTY: Joi.boolean().optional(),
 });

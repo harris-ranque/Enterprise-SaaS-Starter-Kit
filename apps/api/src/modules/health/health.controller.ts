@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, VERSION_NEUTRAL } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 
 type HealthStatus = 'ok' | 'degraded';
@@ -12,7 +12,8 @@ export type HealthResponse = {
   };
 };
 
-@Controller('health')
+// Version-neutral so monitors / k8s probes hit a stable URL (`/api/health`).
+@Controller({ path: 'health', version: VERSION_NEUTRAL })
 export class HealthController {
   constructor(private readonly prisma: PrismaService) {}
 

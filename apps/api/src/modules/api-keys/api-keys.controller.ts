@@ -5,10 +5,7 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/enums/role.enum';
 import { RolesGuard } from 'src/common/guards/role.guard';
 
-@Controller({
-  path: 'api-keys',
-  version: '1',
-})
+@Controller('api-keys')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.ADMIN)
 export class ApiKeysController {

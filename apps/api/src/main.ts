@@ -53,12 +53,14 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.enableVersioning({
     type: VersioningType.URI,
+    defaultVersion: process.env.API_VERSION ?? '1',
   });
 
+  const apiVersion = process.env.API_VERSION ?? '1';
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Healthcare SaaS API')
     .setDescription('Public API documentation')
-    .setVersion('1.0')
+    .setVersion(apiVersion)
     .addBearerAuth()
     .build();
 

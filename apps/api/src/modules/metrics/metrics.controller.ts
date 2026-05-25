@@ -1,4 +1,4 @@
-import { Controller, Get, Header } from '@nestjs/common';
+import { Controller, Get, Header, VERSION_NEUTRAL } from '@nestjs/common';
 
 import { Registry, collectDefaultMetrics } from 'prom-client';
 
@@ -8,7 +8,8 @@ collectDefaultMetrics({
   register,
 });
 
-@Controller('metrics')
+// Version-neutral so Prometheus's scrape config stays stable (`/api/metrics`).
+@Controller({ path: 'metrics', version: VERSION_NEUTRAL })
 export class MetricsController {
   @Get()
   @Header('Content-Type', register.contentType)

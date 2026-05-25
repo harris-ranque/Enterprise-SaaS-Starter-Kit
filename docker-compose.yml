@@ -97,6 +97,28 @@ services:
 
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  # =====================================
+  # PGADMIN
+  # =====================================
+  pgadmin:
+    image: dpage/pgadmin4
+
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@example.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+
+    ports:
+      - '5050:80'
+
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+    depends_on:
+      - postgres
+
   # =====================================
   # PROMETHEUS
   # =====================================
@@ -124,3 +146,4 @@ services:
 
 volumes:
   postgres_data:
+  pgadmin_data:

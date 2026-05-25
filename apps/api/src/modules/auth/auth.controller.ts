@@ -20,10 +20,7 @@ import { RegisterDto } from './dto/register.dto';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { Throttle } from '@nestjs/throttler';
 
-@Controller({
-  path: 'auth',
-  version: '1',
-})
+@Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 

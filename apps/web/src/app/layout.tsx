@@ -1,27 +1,16 @@
-import '@/lib/api/interceptors';
-import { AuthProvider } from '@/providers/auth-provider';
-import { NotificationProvider } from '@/providers/notification-provider';
-import { QueryProvider } from '@/providers/query-provider';
+import { Providers } from '@/providers';
 import './globals.css';
 
-
 export default function RootLayout({
-    children,
+  children,
 }: Readonly<{
-    children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-    return (
-        
-        <html lang="en">
-            <body className="min-h-full flex flex-col">
-                <QueryProvider>
-                    <AuthProvider>
-                        <NotificationProvider>
-                            {children}
-                        </NotificationProvider>
-                    </AuthProvider>
-                </QueryProvider>
-            </body>
-        </html>
-    );
+  return (
+    <html lang="en">
+      <body className="flex min-h-full flex-col">
+        <Providers>{children}</Providers>
+      </body>
+    </html>
+  );
 }

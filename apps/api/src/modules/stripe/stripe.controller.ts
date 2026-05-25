@@ -7,6 +7,8 @@ import {
   Headers,
   type RawBodyRequest,
   Body,
+  VERSION_NEUTRAL,
+  Version,
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth/jwt-auth.guard';
@@ -40,8 +42,10 @@ export class StripeController {
   }
 
   // =========================================
-  // Stripe Webhook
+  // Stripe Webhook — version-neutral so Stripe's configured URL stays stable
+  // (`/api/stripe/webhook`).
   // =========================================
+  @Version(VERSION_NEUTRAL)
   @Post('webhook')
   stripeWebhook(
     @Req() req: RawBodyRequest<Request>,
