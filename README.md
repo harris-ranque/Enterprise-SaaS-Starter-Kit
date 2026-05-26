@@ -1,215 +1,275 @@
-# Stripe-SaaS-Pricing
+# Healthcare SaaS Platform
 
-A production-grade SaaS starter built around Stripe subscriptions, with a Next.js frontend and a NestJS backend in a pnpm + Turborepo monorepo.
+Production-grade Healthcare SaaS platform built with:
 
-## High-Level Architecture
+- Next.js (Frontend)
+- NestJS (Backend)
+- PostgreSQL
+- Prisma ORM
+- Redis
+- BullMQ
+- Docker
+- Kubernetes
+- Cloudflare
+- Stripe + PayPal
+- OpenSearch
+- Socket.IO
+- OpenAI
+- Cloudflare R2
 
-```text
-Internet
-   │
-Cloudflare
-   │
-Frontend (Next.js)
-   │
-Backend API (NestJS)
-   │
-PostgreSQL
-   │
-Redis
-```
+---
 
-### Frontend Responsibilities (Next.js)
+# Architecture Overview
 
-- UI and dashboards
-- Authentication state and protected routes
-- API communication
-- Vendor dashboard
-- Customer portal
-- Payment checkout UI
+Frontend:
+- Next.js App Router
+- TypeScript
+- TailwindCSS
+- shadcn/ui
+- React Query
+- TanStack Table
 
-### Backend Responsibilities (NestJS)
-
-- Authentication (JWT, OAuth) and authorization (RBAC)
-- Stripe and PayPal integrations
-- API security and DTO validation
-- Database access and business logic
-- Audit logs
-- Queue system, email system, and webhooks
-
-## Production-Grade Principles
-
-- TypeScript everywhere
-- ESLint + Prettier + Husky
-- Environment validation and DTO validation
+Backend:
+- NestJS
+- Prisma ORM
+- PostgreSQL
+- Redis
+- BullMQ
+- JWT Authentication
 - RBAC
-- Modular architecture with repository/service pattern
-- Docker for local infra
-- Rate limiting and API versioning
-- Structured logging and centralized error handling
-- Security headers
-- Redis caching and queue workers
-- Verified webhooks
+- Multi-tenancy
+- WebSockets
+- OpenSearch
+- AI Services
 
-## Required Software
+Infrastructure:
+- Docker
+- Kubernetes
+- Cloudflare
+- GitHub Actions
+- Observability stack
 
+---
 
-| Tool           | Purpose                 |
-| -------------- | ----------------------- |
-| Node.js 20 LTS | Runtime                 |
-| pnpm           | Package manager         |
-| Docker Desktop | Containers              |
-| PostgreSQL     | Database                |
-| Redis          | Cache / queue           |
-| VS Code        | IDE                     |
-| Git            | Version control         |
-| uv             | Optional Python tooling |
-
-
-### Install pnpm
+# Project Structure
 
 ```bash
-npm install -g pnpm
-pnpm -v
+apps/
+├── web/                 # Next.js frontend
+├── api/                 # NestJS backend
+packages/
+├── ui/                  # Shared UI library
+├── config/              # Shared configs
+├── types/               # Shared TypeScript types
+infrastructure/
+├── docker/
+├── kubernetes/
+├── terraform/
 ```
 
-### Install Docker Desktop
+---
 
-Install from [Docker Desktop](https://www.docker.com/products/docker-desktop/), then verify:
+# Local Development Setup
+
+## 1. Clone Repository
 
 ```bash
-docker -v
-docker compose version
+git clone <repository-url>
+cd healthcare-saas
 ```
 
-## Project Workspace
-
-```text
-healthcare-saas/
-├── apps/
-│   ├── web/                  # Next.js frontend
-│   └── api/                  # NestJS backend
-├── packages/
-│   ├── ui/                   # Shared UI components
-│   ├── types/                # Shared TS types
-│   ├── eslint-config/
-│   └── tsconfig/
-├── infrastructure/
-│   ├── docker/
-│   └── nginx/
-├── docs/
-├── .github/
-├── pnpm-workspace.yaml
-├── package.json
-└── turbo.json
-```
-
-### Why a Monorepo?
-
-Production SaaS benefits heavily from a monorepo:
-
-- Shared types, validation, and UI
-- Consistent tooling
-- Easier CI/CD
-- Easier scaling
-
-This project uses **Turborepo** + **pnpm workspaces** — a common stack for serious SaaS platforms.
-
-## Getting Started
-
-### 1. Increase pnpm network timeout
-
-Useful on slow or unstable connections:
-
-```bash
-pnpm config set fetch-timeout 600000
-pnpm config set fetch-retries 5
-pnpm config set network-timeout 600000
-```
-
-### 2. Install dependencies
-
-From the repo root:
+## 2. Install Dependencies
 
 ```bash
 pnpm install
 ```
 
-### 3. Start infrastructure (Postgres, Redis, pgAdmin)
+## 3. Environment Variables
+
+Create:
 
 ```bash
-docker compose -f infrastructure/docker/docker-compose.yml \
-  --env-file infrastructure/docker/.env up -d
+apps/api/.env
+apps/web/.env.local
 ```
 
-pgAdmin is available at [http://localhost:5050](http://localhost:5050).
+Example backend environment:
 
-### 4. Configure environment variables
+```env
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/healthcare
+JWT_SECRET=supersecret
+REDIS_HOST=localhost
+OPENAI_API_KEY=your_key
+R2_ENDPOINT=your_endpoint
+R2_ACCESS_KEY_ID=your_key
+R2_SECRET_ACCESS_KEY=your_secret
+```
+
+---
+
+# Docker Setup
+
+Start infrastructure:
 
 ```bash
-cp apps/api/.env.example apps/api/.env
-cp apps/web/.env.example apps/web/.env
-cp infrastructure/docker/.env.example infrastructure/docker/.env
+docker compose up -d
 ```
 
-### 5. Apply database migrations
+Services:
+- PostgreSQL
+- Redis
+- OpenSearch
+- Mailhog
 
-With Postgres running:
+---
+
+# Database Setup
+
+Run Prisma migrations:
 
 ```bash
 cd apps/api
-pnpm db:generate
-pnpm exec prisma migrate deploy
-# or for local dev with migration history: pnpm db:migrate
+
+npx prisma migrate dev
+npx prisma generate
 ```
 
-### 6. Run the apps
+---
 
-Web (Next.js):
+# Running the Application
+
+Frontend:
 
 ```bash
-cd apps/web && pnpm dev
-# or from root
-pnpm --filter web dev
+cd apps/web
+pnpm dev
 ```
 
-API (NestJS):
-
-```bash
-cd apps/api && pnpm start:dev
-# or from root
-pnpm --filter api start:dev
-```
-
-## Generate a Strong Secret Key
-
-For `JWT_SECRET` / `JWT_REFRESH_SECRET`:
-
-```bash
-openssl rand -base64 32
-```
-
-## Prisma Notes
-
-Prisma Client must be generated before the API can compile — `@prisma/client` is a thin wrapper until `prisma generate` writes the typed client into `node_modules`.
-
-Run once after cloning or whenever `prisma/schema.prisma` changes:
+Backend:
 
 ```bash
 cd apps/api
-pnpm db:generate
-# or: npx prisma generate
-```
-
-Then restart the dev server:
-
-```bash
 pnpm start:dev
 ```
 
-### What's wired up
+---
 
-- `postinstall` runs `prisma generate` automatically after `pnpm install`.
-- `start:dev` runs `prisma generate` before `nest start --watch`.
-- `.gitignore` excludes `src/generated/prisma` if you switch to a custom output path later.
+# Authentication Features
 
-After any change to `prisma/schema.prisma`, run `pnpm db:generate` — or rely on `start:dev` / `postinstall`.
+- Email/password login
+- Registration
+- JWT auth
+- Refresh tokens
+- Google OAuth
+- RBAC
+- Multi-tenant isolation
+
+---
+
+# Billing Features
+
+- Stripe subscriptions
+- Stripe Connect
+- PayPal integration
+- Webhook handling
+- Subscription management
+
+---
+
+# Realtime Features
+
+- WebSocket architecture
+- Live notifications
+- Organization rooms
+- Presence systems
+
+---
+
+# AI Features
+
+- AI summarization
+- RAG pipelines
+- Embeddings
+- Vector search
+- AI document processing
+
+---
+
+# Storage Features
+
+- Cloudflare R2
+- Signed upload URLs
+- File metadata tracking
+- Multi-tenant file isolation
+
+---
+
+# Search Features
+
+- OpenSearch integration
+- Full-text search
+- Fuzzy search
+- Global search architecture
+
+---
+
+# Production Features
+
+- Kubernetes deployment
+- CI/CD pipelines
+- Observability
+- Rate limiting
+- Security hardening
+- Audit logging
+- Feature flags
+
+---
+
+# Recommended Commands
+
+Lint:
+
+```bash
+pnpm lint
+```
+
+Tests:
+
+```bash
+pnpm test
+```
+
+Build:
+
+```bash
+pnpm build
+```
+
+---
+
+# Deployment Targets
+
+Recommended:
+- Frontend → Vercel
+- Backend → Kubernetes
+- Database → Managed PostgreSQL
+- Redis → Managed Redis
+- Storage → Cloudflare R2
+
+---
+
+# Recommended Future Improvements
+
+- HIPAA compliance workflows
+- Advanced analytics
+- AI copilots
+- OCR pipelines
+- Healthcare interoperability
+- Event sourcing
+- Advanced audit trails
+
+---
+
+# License
+
+Private enterprise SaaS project.
